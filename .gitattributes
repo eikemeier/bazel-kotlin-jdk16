@@ -1,0 +1,6 @@
+* text=auto
+*.adoc text
+*.bzl text
+*.kt text
+BUILD text
+WORKSPACE text

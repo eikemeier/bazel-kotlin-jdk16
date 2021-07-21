@@ -1,0 +1,105 @@
+= Bazel Kotlin Rules on JDK16
+:Author:    Oliver Eikemeier
+:Email:     <eikemeier@fillmore-labs.com>
+:Date:      2021-07
+:Revision:  v0.1
+:toc: macro
+:prewrap!:
+
+toc::[]
+
+== Discussion
+
+Kotlin compilation failes on JDK16.
+
+[source,shell]
+bazel run //:main
+
+terminates with a compilation error:
+
+....
+Compilation failure: compile phase failed:
+exception: java.lang.ExceptionInInitializerError
+	at com.intellij.pom.java.LanguageLevel.<clinit>(LanguageLevel.java:25)
+	at com.intellij.core.CoreLanguageLevelProjectExtension.<init>(CoreLanguageLevelProjectExtension.java:26)
+	at com.intellij.core.JavaCoreProjectEnvironment.<init>(JavaCoreProjectEnvironment.java:42)
+	at org.jetbrains.kotlin.cli.jvm.compiler.KotlinCoreProjectEnvironment.<init>(KotlinCoreProjectEnvironment.kt:26)
+	at org.jetbrains.kotlin.cli.jvm.compiler.KotlinCoreEnvironment$ProjectEnvironment.<init>(KotlinCoreEnvironment.kt:118)
+	at org.jetbrains.kotlin.cli.jvm.compiler.KotlinCoreEnvironment$Companion.createForProduction(KotlinCoreEnvironment.kt:420)
+	at org.jetbrains.kotlin.cli.jvm.K2JVMCompiler.createCoreEnvironment(K2JVMCompiler.kt:226)
+	at org.jetbrains.kotlin.cli.jvm.K2JVMCompiler.doExecute(K2JVMCompiler.kt:152)
+	at org.jetbrains.kotlin.cli.jvm.K2JVMCompiler.doExecute(K2JVMCompiler.kt:52)
+	at org.jetbrains.kotlin.cli.common.CLICompiler.execImpl(CLICompiler.kt:88)
+	at org.jetbrains.kotlin.cli.common.CLICompiler.execImpl(CLICompiler.kt:44)
+	at org.jetbrains.kotlin.cli.common.CLITool.exec(CLITool.kt:98)
+	at io.bazel.kotlin.compiler.BazelK2JVMCompiler.exec(BazelK2JVMCompiler.kt:30)
+	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
+	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:78)
+	at java.base/jdk.internal.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:567)
+	at io.bazel.kotlin.builder.toolchain.KotlinToolchain$KotlinCliToolInvoker.compile(KotlinToolchain.kt:189)
+	at io.bazel.kotlin.builder.tasks.jvm.Compilation_taskKt$compileKotlin$1$2.invoke(compilation_task.kt:299)
+	at io.bazel.kotlin.builder.tasks.jvm.Compilation_taskKt$compileKotlin$1$2.invoke(compilation_task.kt)
+	at io.bazel.kotlin.builder.toolchain.CompilationTaskContext.executeCompilerTask(CompilationTaskContext.kt:122)
+	at io.bazel.kotlin.builder.toolchain.CompilationTaskContext.executeCompilerTask$default(CompilationTaskContext.kt:118)
+	at io.bazel.kotlin.builder.tasks.jvm.Compilation_taskKt.compileKotlin(compilation_task.kt:299)
+	at io.bazel.kotlin.builder.tasks.jvm.KotlinJvmTaskExecutor$execute$1$$special$$inlined$apply$lambda$1.invoke(KotlinJvmTaskExecutor.kt:62)
+	at io.bazel.kotlin.builder.tasks.jvm.KotlinJvmTaskExecutor$execute$1$$special$$inlined$apply$lambda$1.invoke(KotlinJvmTaskExecutor.kt:33)
+	at io.bazel.kotlin.builder.toolchain.CompilationTaskContext.execute(CompilationTaskContext.kt:148)
+	at io.bazel.kotlin.builder.toolchain.CompilationTaskContext.execute(CompilationTaskContext.kt:140)
+	at io.bazel.kotlin.builder.tasks.jvm.KotlinJvmTaskExecutor$execute$1.invoke(KotlinJvmTaskExecutor.kt:60)
+	at io.bazel.kotlin.builder.tasks.jvm.KotlinJvmTaskExecutor$execute$1.invoke(KotlinJvmTaskExecutor.kt:33)
+	at io.bazel.kotlin.builder.toolchain.CompilationTaskContext.execute(CompilationTaskContext.kt:148)
+	at io.bazel.kotlin.builder.toolchain.CompilationTaskContext.execute(CompilationTaskContext.kt:140)
+	at io.bazel.kotlin.builder.tasks.jvm.KotlinJvmTaskExecutor.execute(KotlinJvmTaskExecutor.kt:56)
+	at io.bazel.kotlin.builder.tasks.KotlinBuilder.executeJvmTask(KotlinBuilder.kt:232)
+	at io.bazel.kotlin.builder.tasks.KotlinBuilder.build(KotlinBuilder.kt:130)
+	at io.bazel.kotlin.builder.tasks.CompileKotlin.invoke(CompileKotlin.kt:27)
+	at io.bazel.worker.PersistentWorker$compileWork$2$result$1.invoke(PersistentWorker.kt:98)
+	at io.bazel.worker.PersistentWorker$compileWork$2$result$1.invoke(PersistentWorker.kt:56)
+	at io.bazel.worker.WorkerContext$TaskContext.resultOf(WorkerContext.kt:125)
+	at io.bazel.worker.WorkerContext.doTask(WorkerContext.kt:153)
+	at io.bazel.worker.PersistentWorker$compileWork$2.invokeSuspend(PersistentWorker.kt:96)
+	at io.bazel.worker.PersistentWorker$compileWork$2.invoke(PersistentWorker.kt)
+	at kotlinx.coroutines.intrinsics.UndispatchedKt.startUndispatchedOrReturn(Undispatched.kt:91)
+	at kotlinx.coroutines.BuildersKt__Builders_commonKt.withContext(Builders.common.kt:165)
+	at kotlinx.coroutines.BuildersKt.withContext(Unknown Source)
+	at io.bazel.worker.PersistentWorker.compileWork(PersistentWorker.kt:95)
+	at io.bazel.worker.PersistentWorker$start$1$$special$$inlined$use$lambda$1$1$2.invokeSuspend(PersistentWorker.kt:75)
+	at kotlin.coroutines.jvm.internal.BaseContinuationImpl.resumeWith(ContinuationImpl.kt:33)
+	at kotlinx.coroutines.DispatchedTask.run(DispatchedTask.kt:106)
+	at kotlinx.coroutines.scheduling.CoroutineScheduler.runSafely(CoroutineScheduler.kt:571)
+	at kotlinx.coroutines.scheduling.CoroutineScheduler$Worker.executeTask(CoroutineScheduler.kt:750)
+	at kotlinx.coroutines.scheduling.CoroutineScheduler$Worker.runWorker(CoroutineScheduler.kt:678)
+	at kotlinx.coroutines.scheduling.CoroutineScheduler$Worker.run(CoroutineScheduler.kt:665)
+Caused by: java.lang.reflect.InaccessibleObjectException: Unable to make protected void java.util.ResourceBundle.setParent(java.util.ResourceBundle) accessible: module java.base does not "opens java.util" to unnamed module @1afd6257
+	at java.base/java.lang.reflect.AccessibleObject.checkCanSetAccessible(AccessibleObject.java:357)
+	at java.base/java.lang.reflect.AccessibleObject.checkCanSetAccessible(AccessibleObject.java:297)
+	at java.base/java.lang.reflect.Method.checkCanSetAccessible(Method.java:199)
+	at java.base/java.lang.reflect.Method.setAccessible(Method.java:193)
+	at com.intellij.util.ReflectionUtil.makeAccessible(ReflectionUtil.java:252)
+	at com.intellij.util.ReflectionUtil.getDeclaredMethod(ReflectionUtil.java:269)
+	at com.intellij.DynamicBundle.<clinit>(DynamicBundle.java:22)
+	... 52 more
+....
+
+if we comment out `build --tool_java_runtime_version` in `link:.bazelrc[.bazelrc]`, compilation
+works.
+
+Bazel: https://github.com/bazelbuild/bazel/releases/tag/5.0.0-pre.20210708.4[5.0.0-pre.20210708.4]
+
+Kotlin Rules: https://github.com/bazelbuild/rules_kotlin/releases/tag/v1.5.0-beta-2[1.5.0 (Beta 2)]
+
+[bibliography]
+== References
+
+* [[[GH-527]]] Bazel Kotlin Rules https://github.com/bazelbuild/rules_kotlin/pull/527[issue #527]:
+_“Reduce illegal reflective operation warnings when compiling code”_
+* [[[KT-43704]]] JetBrains Kotlin https://youtrack.jetbrains.com/issue/KT-43704[issue KT-43704]:
+_“Illegal reflective access by com.intellij.util.ReflectionUtil to method
+java.util.ResourceBundle.setParent(java.util.ResourceBundle)”_
+* [[[KT-47152]]] JetBrains Kotlin https://youtrack.jetbrains.com/issue/KT-47152[issue KT-47152]:
+_“Incremental Compilation with Kotlin compile daemon and JDK 17 fails with IllegalAccessException”_
+* [[[KT-45689]]] JetBrains Kotlin https://youtrack.jetbrains.com/issue/KT-45689[issue KT-45689]:
+_“JDK-16: kotlin-maven-plugin fails with 'IllegalAccessError: class
+com.intellij.util.io.FileChannelUtil' when using incremental compilation”_

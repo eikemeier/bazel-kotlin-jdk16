@@ -1,0 +1,9 @@
+.*
+!/.bazelignore
+!/.bazelrc
+!/.bazelversion
+!/.envrc
+!/.gitattributes
+!/.gitignore
+/bazel-*
+/bin/
