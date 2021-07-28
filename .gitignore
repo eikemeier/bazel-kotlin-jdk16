@@ -7,3 +7,4 @@
 !/.gitignore
 /bazel-*
 /bin/
+/user.bazelrc
