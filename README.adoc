@@ -86,7 +86,7 @@ Caused by: java.lang.reflect.InaccessibleObjectException: Unable to make protect
 if we comment out `build --tool_java_runtime_version` in `link:.bazelrc[.bazelrc]`, compilation
 works.
 
-Bazel: https://github.com/bazelbuild/bazel/releases/tag/5.0.0-pre.20210720.2[5.0.0-pre.20210720.2]
+Bazel: https://github.com/bazelbuild/bazel/releases/tag/5.0.0-pre.20210722.2[5.0.0-pre.20210722.2]
 
 Kotlin Rules: https://github.com/bazelbuild/rules_kotlin/releases/tag/v1.5.0-beta-3[1.5.0 (Beta 3)]
 
